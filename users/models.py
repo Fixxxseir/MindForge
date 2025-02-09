@@ -9,7 +9,7 @@ class User(AbstractUser):
         upload_to="users/avatars/", blank=True, null=True, verbose_name="Аватар", help_text="Загрузите свой аватар"
     )
     phone_number = PhoneNumberField(blank=True, verbose_name="Телефон")
-    country = models.CharField(max_length=20, verbose_name="Страна проживания", help_text="Введите страну проживания")
+    country = models.CharField(blank=True, max_length=20, verbose_name="Страна проживания", help_text="Введите страну проживания")
 
     token = models.CharField(max_length=100, verbose_name="Token", blank=True, null=True)
 
