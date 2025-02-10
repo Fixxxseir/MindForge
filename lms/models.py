@@ -13,6 +13,8 @@ class Course(models.Model):
     description = models.TextField(
         blank=True, null=True, verbose_name="Описание курса", help_text="Введите описание курса"
     )
+    time_create = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    time_update = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -25,7 +27,7 @@ class Course(models.Model):
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name="Курс")
     title = models.CharField(max_length=255, verbose_name="Название урока", help_text="Введите название урока")
-    description = models.TextField(blank=True, verbose_name="Описание урока")
+    description = models.TextField(blank=True, null=True, verbose_name="Описание урока")
     image_preview = models.ImageField(
         upload_to="lessons/preview",
         blank=True,
@@ -34,6 +36,8 @@ class Lesson(models.Model):
         help_text="Загрузите изображение для превью урока",
     )
     video_link = models.URLField(verbose_name="Ссылка на видео", null=True, blank=True)
+    time_create = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    time_update = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return self.title
