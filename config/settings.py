@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     "phonenumber_field",
     "lms",
+    'django_filters',
 ]
 
 MIDDLEWARE = [
