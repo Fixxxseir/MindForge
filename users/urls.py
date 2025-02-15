@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from users.apps import UsersConfig
 
-from .views import UserProfileUpdateView, UserRegisterAPIView
+from .views import UserProfileUpdateView, UserRegisterAPIView, PaymentListAPIView, UserDetailAPIView
 
 app_name = UsersConfig.name
 
@@ -12,4 +12,6 @@ urlpatterns = [
     path("profile/", UserProfileUpdateView.as_view(), name="profile"),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),  # Получение JWT-токена
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),  # Обновление JWT-токена
+    path("detail/", UserDetailAPIView.as_view(), name="user-detail"),
+    path("payments/", PaymentListAPIView.as_view(), name="user-payment")
 ]
