@@ -1,0 +1,87 @@
+[
+{
+    "model": "lms.course",
+    "pk": 1,
+    "fields": {
+        "title": "Курс по Python",
+        "image_preview": "",
+        "description": "полный курс по Python",
+        "time_create": "2025-02-14T19:24:54.313Z",
+        "time_update": "2025-02-14T19:24:54.313Z"
+    }
+},
+{
+    "model": "lms.course",
+    "pk": 2,
+    "fields": {
+        "title": "Курс по Java",
+        "image_preview": "",
+        "description": "Полный курс по Java",
+        "time_create": "2025-02-14T19:25:16.399Z",
+        "time_update": "2025-02-14T19:25:16.399Z"
+    }
+},
+{
+    "model": "lms.course",
+    "pk": 3,
+    "fields": {
+        "title": "Курс по golang",
+        "image_preview": "",
+        "description": "Полный курс по golang",
+        "time_create": "2025-02-14T19:25:44.168Z",
+        "time_update": "2025-02-14T19:25:44.168Z"
+    }
+},
+{
+    "model": "lms.lesson",
+    "pk": 1,
+    "fields": {
+        "course": 1,
+        "title": "Азы Python",
+        "description": "Введение",
+        "image_preview": "",
+        "video_link": null,
+        "time_create": "2025-02-14T19:27:08.984Z",
+        "time_update": "2025-02-14T19:27:08.984Z"
+    }
+},
+{
+    "model": "lms.lesson",
+    "pk": 2,
+    "fields": {
+        "course": 2,
+        "title": "Азы java",
+        "description": "Введение",
+        "image_preview": "",
+        "video_link": null,
+        "time_create": "2025-02-14T19:27:26.380Z",
+        "time_update": "2025-02-14T19:27:26.380Z"
+    }
+},
+{
+    "model": "lms.lesson",
+    "pk": 3,
+    "fields": {
+        "course": 3,
+        "title": "Азы golang",
+        "description": "Введение",
+        "image_preview": "",
+        "video_link": null,
+        "time_create": "2025-02-14T19:27:40.536Z",
+        "time_update": "2025-02-14T19:27:40.536Z"
+    }
+},
+{
+    "model": "lms.lesson",
+    "pk": 5,
+    "fields": {
+        "course": 1,
+        "title": "Типы данных Python",
+        "description": "Информация о том какие бывают данные в языке Python",
+        "image_preview": "",
+        "video_link": null,
+        "time_create": "2025-02-14T19:32:46.618Z",
+        "time_update": "2025-02-14T19:32:46.618Z"
+    }
+}
+]
