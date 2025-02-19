@@ -4,9 +4,14 @@ from lms.models import Course, Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    course = serializers.SerializerMethodField()
+
     class Meta:
         model = Lesson
         fields = "__all__"
+
+    def get_course(self, instance):
+        return instance.course.title
 
 
 class CourseSerializer(serializers.ModelSerializer):
