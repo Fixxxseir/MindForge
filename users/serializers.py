@@ -58,17 +58,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         return "Не приобретено"
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ["id", "email", "username", "avatar", "phone_number", "country"]
-        read_only_fields = [
-            "id",
-        ]
-
-
-class UserDetailSerializer(serializers.ModelSerializer):
+class UserPrivateSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -78,3 +68,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "id",
             "payments",
         ]
+
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "avatar", "phone_number", "country"]
+        read_only_fields = fields

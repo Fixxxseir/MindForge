@@ -16,6 +16,7 @@ python-dotenv = "^1.0.1"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^8.0.0"}
 django-filter = "^24.3"
 djangorestframework-simplejwt = "^5.4.0"
+ipython = "^8.32.0"
 
 
 [tool.poetry.group.lint.dependencies]
