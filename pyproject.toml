@@ -20,6 +20,7 @@ ipython = "^8.32.0"
 coverage = "^7.6.12"
 drf-yasg = "^1.21.9"
 drf-spectacular = "^0.28.0"
+stripe = "^11.6.0"
 
 
 [tool.poetry.group.lint.dependencies]
