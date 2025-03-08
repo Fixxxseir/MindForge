@@ -1,22 +1,28 @@
 from rest_framework import serializers
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subscription
+from lms.validators import CustomURLValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
     course = serializers.SerializerMethodField()
+    video_link = serializers.URLField(validators=[CustomURLValidator(field="video_link")], required=False)
 
     class Meta:
         model = Lesson
         fields = "__all__"
+        # validators = [CustomURLValidator(field="video_link")]
 
     def get_course(self, instance):
-        return instance.course.title
+        if instance.course is not None:
+            return instance.course.title
+        return None
 
 
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
+    subscription = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -27,13 +33,24 @@ class CourseSerializer(serializers.ModelSerializer):
             "image_preview",
             "time_create",
             "time_update",
+            "owner",
             "lessons_count",
             "lessons",
+            "subscription",
         )
-        read_only_fields = ("id",)
+        read_only_fields = (
+            "id",
+            "owner",
+        )
 
     def get_lessons_count(self, instance):
         return instance.lessons.count()
+
+    def get_subscription(self, instance):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return Subscription.objects.filter(owner=request.user, course=instance).exists()
+        return False
 
 
 # class CourseSerializer(serializers.Serializer):
