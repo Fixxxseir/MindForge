@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from .models import Payment
 from .serializers import PaymentSerializer, UserPrivateSerializer, UserPublicSerializer, UserRegisterSerializer
+from .services import StripeService
 
 User = get_user_model()
 
@@ -78,3 +79,18 @@ class PaymentListAPIView(generics.ListAPIView):
         "payment_methods",
     )
     ordering_fields = ("payment_date",)
+
+
+class PaymentCreateAPIView(generics.CreateAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        payment_object = payment.paid_course if payment.paid_course else payment.paid_lesson
+        product = StripeService.create_stripe_product(name=payment_object.title)
+        price = StripeService.create_stripe_price(payment.payment_amount, product)
+        session = StripeService.create_stripe_session("http://127.0.0.1:8000/", price)
+        payment.session_id = session.get("id")
+        payment.link = session.get("url")
+        payment.save()
