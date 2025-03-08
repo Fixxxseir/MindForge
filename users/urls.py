@@ -4,7 +4,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from users.apps import UsersConfig
 
-from .views import PaymentListAPIView, UserListAPIView, UserRegisterAPIView, UserRetrieveUpdateAPIView
+from .views import (PaymentCreateAPIView, PaymentListAPIView, UserListAPIView, UserRegisterAPIView,
+                    UserRetrieveUpdateAPIView)
 
 app_name = UsersConfig.name
 
@@ -20,4 +21,5 @@ urlpatterns = [
         "token/refresh/", TokenRefreshView.as_view(permission_classes=(AllowAny,)), name="token_refresh"
     ),  # Обновление access-JWT-токена через refresh-JWT-токен
     path("payments/", PaymentListAPIView.as_view(), name="user-payment"),
+    path("payment_create/", PaymentCreateAPIView.as_view(), name="payment-create"),
 ]
