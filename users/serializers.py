@@ -2,9 +2,11 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from lms.models import Course, Lesson
 from users.models import Payment
 
 User = get_user_model()
+
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -32,27 +34,22 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    payment_methods = serializers.SerializerMethodField()
-    payment_status = serializers.SerializerMethodField()
-    paid_course = serializers.SerializerMethodField()
-    paid_lesson = serializers.SerializerMethodField()
+    paid_course = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all(), required=False)
+    paid_lesson = serializers.PrimaryKeyRelatedField(queryset=Lesson.objects.all(), required=False)
+    paid_course_title = serializers.SerializerMethodField()
+    paid_lesson_title = serializers.SerializerMethodField()
 
     class Meta:
         model = Payment
         fields = "__all__"
+        read_only_fields = ("user", "payment_status", "session_id", "link")
 
-    def get_payment_methods(self, obj):
-        return obj.get_payment_methods_display()
-
-    def get_payment_status(self, obj):
-        return obj.get_payment_status_display()
-
-    def get_paid_course(self, obj):
+    def get_paid_course_title(self, obj):
         if obj.paid_course:
             return obj.paid_course.title
         return "Не приобретено"
 
-    def get_paid_lesson(self, obj):
+    def get_paid_lesson_title(self, obj):
         if obj.paid_lesson:
             return obj.paid_lesson.title
         return "Не приобретено"

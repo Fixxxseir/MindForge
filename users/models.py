@@ -31,13 +31,12 @@ class User(AbstractUser):
 
 
 class Payment(models.Model):
-    class Method(models.IntegerChoices):
-        CASH = 0, "Наличные"
-        TRANSFER = 1, "Перевод на счёт"
-
-    class Status(models.IntegerChoices):
-        PENDING = 0, "Ожидает оплаты"
-        PAID = 1, "Оплачен"
+    PAYMENT_METHOD_CHOICES = [("cash", "Оплата наличными"), ("transfer", "Перевод на счёт")]
+    PAYMENT_STATUS_CHOICES = [
+        ("pending", "Ожидает оплаты"),
+        ("paid", "Оплачен"),
+        ("failed", "Ошибка оплаты"),
+    ]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь", related_name="payments"
@@ -59,12 +58,29 @@ class Payment(models.Model):
         verbose_name="оплаченный урок",
         related_name="payments",
     )
-    payment_amount = models.FloatField(blank=True, null=True, verbose_name="Сумма оплаты")
-    payment_methods = models.SmallIntegerField(
-        choices=Method.choices, blank=True, null=True, verbose_name="Способ оплаты"
+    payment_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Сумма оплаты"
     )
-    payment_status = models.SmallIntegerField(
-        choices=Status.choices, default=Status.PENDING, verbose_name="Статус оплаты"
+    payment_methods = models.CharField(
+        max_length=8,
+        choices=PAYMENT_METHOD_CHOICES,
+        default="transfer",
+        verbose_name="Метод оплаты",
+        help_text="Выберете метод оплаты",
+    )
+    payment_status = models.CharField(
+        max_length=8,
+        choices=PAYMENT_STATUS_CHOICES,
+        default="pending",
+        verbose_name="Статус оплаты",
+        help_text="Выберете статус оплаты",
+    )
+
+    session_id = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Id сессии", help_text="Укажите Id сессии"
+    )
+    link = models.URLField(
+        max_length=500, blank=True, null=True, verbose_name="Ссылка на оплату", help_text="Укажите ссылку на оплату"
     )
 
     class Meta:

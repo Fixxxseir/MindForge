@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -16,6 +19,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     pagination_class = LmsPaginator
 
+    @extend_schema(
+        request=CourseSerializer,
+        responses={201: CourseSerializer},
+    )
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
