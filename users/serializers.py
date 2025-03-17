@@ -8,7 +8,6 @@ from users.models import Payment
 User = get_user_model()
 
 
-
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
