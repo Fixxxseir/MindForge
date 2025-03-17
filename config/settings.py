@@ -191,7 +191,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CUR_API_URL = 'https://api.currencyapi.com/'
-CUR_API_KEY = 'cur_live_Ccz1hAWX2HnxVAyIBbzCuKsO1LMdgzm9r8wr7I9J'
+CUR_API_KEY = os.getenv("CUR_API_KEY")
 
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
