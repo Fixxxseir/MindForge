@@ -79,19 +79,14 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
 
 class SubscriptionAPIView(APIView):
+    def post(self, request, course_id, *args, **kwargs):
+        course = get_object_or_404(Course, id=course_id)
+        subscription, created = Subscription.objects.get_or_create(
+            owner=request.user,
+            course=course,
+        )
 
-    def post(self, *args, **kwarg):
-        user = self.request.user
-        course_id = self.request.data.get("course_id")
-        course_item = get_object_or_404(Course, id=course_id)
-
-        sub_item = Subscription.objects.filter(owner=user, course=course_item)
-
-        if sub_item.exists():
-            sub_item.delete()
-            message = "подписка удалена"
-        else:
-            Subscription.objects.create(owner=user, course=course_item)
-            message = "подписка добавлена"
-
-        return Response({"message": message})
+        if not created:
+            subscription.delete()
+            return Response({"message": "Подписка удалена"})
+        return Response({"message": "Подписка добавлена"})
