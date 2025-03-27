@@ -1,12 +1,10 @@
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from drf_spectacular.utils import extend_schema
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from tasks import send_mail_course_update
 
 from users.permissions import IsModer, IsOwner
 
@@ -25,6 +23,11 @@ class CourseViewSet(viewsets.ModelViewSet):
     )
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        send_mail_course_update.delay(course_id=instance.id)
+        return instance
 
     def get_queryset(self):
         if self.request.user.groups.filter(name="moders").exists():
