@@ -4,7 +4,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from tasks import send_mail_course_update
+from lms.tasks import send_mail_course_update
 
 from users.permissions import IsModer, IsOwner
 
@@ -17,10 +17,6 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     pagination_class = LmsPaginator
 
-    @extend_schema(
-        request=CourseSerializer,
-        responses={201: CourseSerializer},
-    )
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -30,6 +26,8 @@ class CourseViewSet(viewsets.ModelViewSet):
         return instance
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Course.objects.none()
         if self.request.user.groups.filter(name="moders").exists():
             return Course.objects.all().order_by("id")
         return Course.objects.filter(owner=self.request.user).order_by("id")
@@ -59,6 +57,8 @@ class LessonListAPIView(generics.ListAPIView):
     pagination_class = LmsPaginator
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Course.objects.none()
         if self.request.user.groups.filter(name="moders").exists():
             return Lesson.objects.all().order_by("id")
         return Lesson.objects.filter(owner=self.request.user).order_by("id")
@@ -82,7 +82,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
 
 class SubscriptionAPIView(APIView):
-    def post(self, request, course_id, *args, **kwargs):
+    def post(self, request, course_id):
         course = get_object_or_404(Course, id=course_id)
         subscription, created = Subscription.objects.get_or_create(
             owner=request.user,
