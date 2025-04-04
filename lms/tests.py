@@ -232,26 +232,19 @@ class SubscriptionAPITestCase(APITestCase):
         # self.subscription = Subscription.objects.create(owner=self.user, course=self.course)
 
     def test_create_subscription(self):
-        url = reverse("lms:course-subscription")
-        data = {"course_id": self.course.id}
-        response = self.client.post(url, data=data)
-        response_data = response.json()
+        url = reverse("lms:course-subscription", kwargs={'course_id': self.course.id})
+        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response_data, {"message": "подписка добавлена"})
+        self.assertEqual(response.json(), {"message": "подписка добавлена"})
 
     def test_delete_subscription(self):
         Subscription.objects.create(owner=self.user, course=self.course)
-        url = reverse("lms:course-subscription")
-        data = {"course_id": self.course.id}
-        response = self.client.post(url, data=data)
-        response_data = response.json()
+        url = reverse("lms:course-subscription", kwargs={'course_id': self.course.id})
+        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response_data, {"message": "подписка удалена"})
+        self.assertEqual(response.json(), {"message": "подписка удалена"})
 
     def test_creating_subscription_for_nonexistent_course(self):
-        url = reverse("lms:course-subscription")
-        data = {"course_id": 12345}
-
-        response = self.client.post(url, data=data)
-
+        url = reverse("lms:course-subscription", kwargs={'course_id': 12345})
+        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
