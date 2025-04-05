@@ -242,7 +242,7 @@ class SubscriptionAPITestCase(APITestCase):
         url = reverse("lms:course-subscription", kwargs={'course_id': self.course.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), {"message": "подписка удалена"})
+        self.assertEqual(response.json(), {"message": "Подписка удалена"})
 
     def test_creating_subscription_for_nonexistent_course(self):
         url = reverse("lms:course-subscription", kwargs={'course_id': 12345})
