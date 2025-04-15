@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry install
+          poetry install --no-root
 
       # МИГРАЦИИ
       - name: Run migrate
