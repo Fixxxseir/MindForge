@@ -1,0 +1,107 @@
+name: Django CI
+
+on: [ push, pull_request ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ПОЛУЧАЕМ КОД ИЗ РЕПОЗИТОРИЯ
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # УСТАНАВЛИВЕМ python нужной версии
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # УСТАНОВКА ЛИНТЕРА
+      - name: Install flake8
+        run: |
+          python -m pip install poetry
+          poetry add flake8
+
+      - name: Run Flake8
+        run: flake8 .
+
+  test:
+    # СРЕДА ГДЕ БУДЕТ ВЫПОЛНЯТЬСЯ ЗАДАЧА
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      # КЛОНИРОВАНИЕ РЕПОЗИТОРИЯ С ИСХОДНЫМ КОДОМ
+      - name: Chech out code
+        uses: actions/checkout@v3
+
+      # УСТАНОВКА Python нужной версии
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # КЕШИРОВАНИЕ ЗАВИСИМОСТЕЙ(что бы ускорить процесс установки зависимостей)
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      # УСТАНОВКА Poetry и УСТАНОВКА ЗАВИСИМОСТЕЙ
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+
+      # МИГРАЦИИ
+      - name: Run migrate
+        run: python manage.py migrate
+
+      # ЗАПУСК ТЕСТОВ
+      - name: Run tests
+        run: python manage.py test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      # КЛОНИРУЕМ КОД ИЗ РЕПОЗИТОРИЯ
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # АВТОРИЗУЕМСЯ(аутентификация) В Docker Hub используя учетные данные из секретов
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      # Собираем Docker образ используя тег на основе крайнего коммита
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+
+      # Отправляем собранный образ в Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # ПОДКЛЮЧЕНИЕ К СЕРВЕРУ ЧЕРЕЗ SSH
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            docker stop myapp || true
+            docker rm myapp || true
+            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          EOF

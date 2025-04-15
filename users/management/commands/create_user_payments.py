@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import connection
-from phonenumber_field.phonenumber import PhoneNumber
 
 from lms.models import Course, Lesson
 from users.models import Payment
@@ -62,8 +61,7 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Добавление успешно {course.title}"))
             else:
-                self.stdout.write(self.style.WARNING(f"Что-то пошло не так"))
-        # Создание урок
+                self.stdout.write(self.style.WARNING("Что-то пошло не так"))
         lessons = [
             {
                 "course": Course.objects.get(id=1),
@@ -91,8 +89,7 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Добавление успешно {lesson.title}"))
             else:
-                self.stdout.write(self.style.WARNING(f"Что-то пошло не так"))
-        # Создание платежей
+                self.stdout.write(self.style.WARNING("Что-то пошло не так"))
         payments = [
             {
                 "user": user,
@@ -116,4 +113,4 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Добавление успешно {payment.id}"))
             else:
-                self.stdout.write(self.style.WARNING(f"Что-то пошло не так"))
+                self.stdout.write(self.style.WARNING("Что-то пошло не так"))
