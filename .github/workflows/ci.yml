@@ -60,6 +60,8 @@ jobs:
 
       # МИГРАЦИИ
       - name: Run migrate
+        env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
