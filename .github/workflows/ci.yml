@@ -60,11 +60,11 @@ jobs:
 
       # МИГРАЦИИ
       - name: Run migrate
-        run: python manage.py migrate
+        run: poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
-        run: python manage.py test
+        run: poetry run python manage.py test
 
   build:
     needs: test
