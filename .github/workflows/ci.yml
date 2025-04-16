@@ -69,19 +69,14 @@ jobs:
       # МИГРАЦИИ
       - name: Run migrate
         env:
-          NAME: mindforge_db
-          USER: postgres
-          PASSWORD: postgres
-          HOST: localhost
-        run: poetry run python manage.py migrate
+          DATABASE_URL: "sqlite:///db.sqlite3"
+        run: |
+          poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
         env:
-          NAME: mindforge_db
-          USER: postgres
-          PASSWORD: postgres
-          HOST: localhost
+          DATABASE_URL: "sqlite:///db.sqlite3"
         run: poetry run python manage.py test
 
   build:
