@@ -68,6 +68,7 @@ jobs:
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
         env:
+          CELERY_BROKER_URL: redis://localhost:6379/0
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: poetry run python manage.py test
 
