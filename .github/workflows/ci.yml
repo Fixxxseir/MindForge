@@ -104,59 +104,28 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    # ПОДКЛЮЧЕНИЕ К СЕРВЕРУ ЧЕРЕЗ SSH
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          cat << 'EOF' > .env
+          ${{ secrets.DOTENV }}
+          EOF
+        shell: bash
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-
+      # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
       - name: Deploy to Server
         run: |
-          # Создаем .env файл локально и копируем на сервер
-          cat << 'EOF' > .env
-          SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
-          DEBUG=False
-          # Добавьте другие необходимые переменные
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            sudo docker stop myapp || true
+            sudo docker rm myapp || true
+            sudo docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
           EOF
-          
-          scp -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/mindforge/.env
-        
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'ENDSSH'
-
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'ENDSSH'
-          
-          set -e
-          echo "### Пул нового образа ###"
-          sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-          
-          echo "### Остановка старого контейнера ###"
-          sudo docker stop myapp || true
-          
-          echo "### Удаление старого контейнера ###"
-          sudo docker rm myapp || true
-          
-          echo "### Создание директорий ###"
-          sudo mkdir -p /home/mindforge/static /home/mindforge/media
-          sudo chown -R 1000:1000 /home/mindforge/static /home/mindforge/media
-          
-          echo "### Старт нового контейнера ###"
-          sudo docker run -d \
-            --name myapp \
-            -p 80:8000 \
-            --env-file /home/mindforge/.env \
-            -v /home/mindforge/static:/app/static \
-            -v /home/mindforge/media:/app/media \
-            ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-          
-          echo "### Ожидание старта контейнера ###"
-          sleep 10
-          
-          echo "### Проверка статуса контейнера ###"
-          sudo docker ps -a | grep myapp
-          
-          echo "### Проверка логов ###"
-          sudo docker logs myapp --tail 50
-          ENDSSH
