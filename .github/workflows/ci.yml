@@ -53,10 +53,10 @@ jobs:
             ${{ runner.os }}-poetry-
 
       # УСТАНОВКА Poetry и УСТАНОВКА ЗАВИСИМОСТЕЙ
-#      - name: Install dependencies
-#        run: |
-#          pip install poetry
-#          poetry install --no-root
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --no-root
 #
 #      - name: Create .env file
 #        run: |
