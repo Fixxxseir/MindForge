@@ -47,7 +47,7 @@ services:
       timeout: 10s
       retries: 5
     ports:
-      - "5433:5432"
+      - "5432:5432"
     networks:
       - backend
 
