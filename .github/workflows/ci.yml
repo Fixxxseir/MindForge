@@ -70,15 +70,15 @@ jobs:
       - name: Run migrate
         env:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_URL: "sqlite:///db.sqlite3"
         run: |
-          poetry shell
-          python manage.py migrate
+          poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
-        run: |
-          poetry shell
-          python manage.py test
+        env:
+          DATABASE_URL: "sqlite:///test_db.sqlite3"
+        run: poetry run python manage.py test
 
   build:
     needs: test
