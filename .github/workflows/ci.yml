@@ -58,6 +58,10 @@ jobs:
           pip install poetry
           poetry install --no-root
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.DOTENV }}" > .env
+
       # МИГРАЦИИ
       - name: Run migrate
         env:
