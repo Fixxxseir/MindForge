@@ -53,18 +53,18 @@ jobs:
             ${{ runner.os }}-poetry-
 
       # УСТАНОВКА Poetry и УСТАНОВКА ЗАВИСИМОСТЕЙ
-      - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install --no-root
-
-      - name: Create .env file
-        run: |
-          cat << 'EOF' > .env
-          ${{ secrets.DOTENV }}
-          EOF
-      - name: Verify .env
-        run: cat .env
+#      - name: Install dependencies
+#        run: |
+#          pip install poetry
+#          poetry install --no-root
+#
+#      - name: Create .env file
+#        run: |
+#          cat << 'EOF' > .env
+#          ${{ secrets.DOTENV }}
+#          EOF
+#      - name: Verify .env
+#        run: cat .env
 
       # МИГРАЦИИ
       - name: Run migrate
