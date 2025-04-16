@@ -12,6 +12,10 @@ RUN apt-get update && \
     build-essential \
     libpq-dev \
     gettext \
+    curl \
+    netcat-openbsd \
+    procps \
+    iputils-ping \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,7 +28,9 @@ RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY . .
 
-RUN mkdir -p /app/staticfiles && chmod -R 755 /app/staticfiles
+RUN mkdir -p /app/staticfiles /app/media && \
+    chown -R 1000:1000 /app/staticfiles /app/media && \
+    chmod -R 755 /app/staticfiles /app/media
 
 EXPOSE 8000
 
