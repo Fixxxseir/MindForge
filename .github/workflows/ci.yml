@@ -124,7 +124,7 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            export SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+            export SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}"
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
             sudo docker stop myapp || true
             sudo docker rm myapp || true
