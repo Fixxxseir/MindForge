@@ -5,20 +5,6 @@ on: [ push, pull_request ]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16.0
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U testuser" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 5
 
     steps:
       # ПОЛУЧАЕМ КОД ИЗ РЕПОЗИТОРИЯ
@@ -84,12 +70,11 @@ jobs:
       - name: Run migrate
         env:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        run:
-          poetry run python manage.py migrate
+        run: python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
-        run: poetry run python manage.py test
+        run: python manage.py test
 
   build:
     needs: test
