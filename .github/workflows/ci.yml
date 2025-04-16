@@ -61,10 +61,11 @@ jobs:
       - name: Create .env file
         run: |
           cat << 'EOF' > .env
-          ${{ secrets.DOTENV }}
+          DATABASE_URL=sqlite:///db.sqlite3
+          DB_ENGINE=django.db.backends.sqlite3
+          SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          DEBUG=False
           EOF
-      - name: Verify .env
-        run: cat .env
 
       # МИГРАЦИИ
       - name: Run migrate
