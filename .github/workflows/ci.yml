@@ -69,15 +69,19 @@ jobs:
       # МИГРАЦИИ
       - name: Run migrate
         env:
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DATABASE_URL: "sqlite:///db.sqlite3"
+          NAME: mindforge_db
+          USER: postgres
+          PASSWORD: postgres
+          HOST: localhost
         run: poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
         env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DATABASE_URL: "sqlite:///db.sqlite3"
+          NAME: mindforge_db
+          USER: postgres
+          PASSWORD: postgres
+          HOST: localhost
         run: poetry run python manage.py test
 
   build:
