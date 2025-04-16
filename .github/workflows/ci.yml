@@ -70,11 +70,15 @@ jobs:
       - name: Run migrate
         env:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        run: python manage.py migrate
+        run: |
+          poetry shell
+          python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
-        run: python manage.py test
+        run: |
+          poetry shell
+          python manage.py test
 
   build:
     needs: test
