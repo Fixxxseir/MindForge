@@ -68,15 +68,11 @@ jobs:
 
       # МИГРАЦИИ
       - name: Run migrate
-        env:
-          DATABASE_URL: "sqlite:///db.sqlite3"
-        run: |
+        run:
           poetry run python manage.py migrate
 
       # ЗАПУСК ТЕСТОВ
       - name: Run tests
-        env:
-          DATABASE_URL: "sqlite:///db.sqlite3"
         run: poetry run python manage.py test
 
   build:
