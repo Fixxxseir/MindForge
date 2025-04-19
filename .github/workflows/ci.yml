@@ -124,6 +124,10 @@ jobs:
           # Основной образ
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          
+          # Образ Nginx
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }} -f nginx/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}
 
   deploy:
     needs: build
@@ -158,6 +162,10 @@ jobs:
             sudo docker-compose -f docker-compose.yml pull && \
             sudo docker-compose -f docker-compose.yml up -d --build --force-recreate
           "
+          
+          
+          
+        
 
 #      - name:eploy to Server
 #        run: |
