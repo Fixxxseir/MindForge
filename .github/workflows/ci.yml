@@ -150,7 +150,7 @@ jobs:
       - name: Deploy to server
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+          ssh -o StrictHostKeyChecking=no ./nginx ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd MindForge && \
             sudo docker system prune -af && \
             sudo docker volume prune -f && \
