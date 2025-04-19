@@ -151,9 +151,11 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
-            cd ~/MindForge && \
-            sudo docker compose down --remove-orphans && \
-            sudo docker compose pull && \
+            cd MindForge && \
+            sudo docker system prune -af && \
+            sudo docker volume prune -f && \
+            sudo docker-compose -f docker-compose.yml down --remove-orphans && \
+            sudo docker-compose -f docker-compose.yml pull && \
             sudo docker-compose -f docker-compose.yml up -d --build --force-recreate
           "
           
