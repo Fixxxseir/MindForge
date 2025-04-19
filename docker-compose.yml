@@ -15,8 +15,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      celery_beat:
-        condition: service_healthy
     networks:
       - backend
 
