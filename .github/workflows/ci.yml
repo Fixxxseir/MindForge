@@ -163,9 +163,10 @@ jobs:
           
           
           
+         
           
 
-#      - name: Deploy to Server
+#      - name:eploy to Server
 #        run: |
 #          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
 #            export SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}"
