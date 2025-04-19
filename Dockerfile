@@ -20,7 +20,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install poetry
+    pip install poetry && \
     poetry install --no-root --no-interaction --no-ansi
 
 COPY . .
