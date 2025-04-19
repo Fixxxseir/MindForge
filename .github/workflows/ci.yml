@@ -138,7 +138,9 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ secrets.DOTENV }}" | sed '/^#/d' > .env
+          cat << 'EOF' > .env
+          ${{ secrets.DOTENV }}
+          EOF
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -147,7 +149,7 @@ jobs:
       # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
       - name: Deploy to server
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:MindForge/
+          scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd MindForge && \
             sudo docker system prune -af && \
