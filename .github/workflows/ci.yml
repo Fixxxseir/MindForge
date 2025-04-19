@@ -119,13 +119,25 @@ jobs:
       - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-      # Собираем Docker образ используя тег на основе крайнего коммита
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+      - name: Build and push web image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-web:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-web:${{ github.sha }}
 
-      # Отправляем собранный образ в Docker Hub
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+      - name: Build and push nginx image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }} -f nginx/Dockerfile ./nginx
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }}
+
+      - name: Build and push celery image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }} --target=celery .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }}
+
+      - name: Build and push celery-beat image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }} --target=celerybeat .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }}
 
   deploy:
     needs: build
@@ -146,17 +158,22 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-      # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
+
+      - name: Update docker-compose.yml with new images
+        run: |
+          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-web:${{ github.sha }}|" docker-compose.yml
+          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }}|" docker-compose.yml
+          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }}|" docker-compose.yml services.celery
+          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }}|" docker-compose.yml services.celery_beat
+
       - name: Deploy to server
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
-          ssh -o StrictHostKeyChecking=no ./nginx ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd MindForge && \
-            sudo docker system prune -af && \
-            sudo docker volume prune -f && \
-            sudo docker-compose -f docker-compose.yml down --remove-orphans && \
-            sudo docker-compose -f docker-compose.yml pull && \
-            sudo docker-compose -f docker-compose.yml up -d --build --force-recreate
+            sudo docker-compose down --remove-orphans && \
+            sudo docker-compose pull && \
+            sudo docker-compose up -d
           "
           
           
