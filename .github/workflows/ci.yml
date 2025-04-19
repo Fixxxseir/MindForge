@@ -148,9 +148,10 @@ jobs:
       # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
       - name: Deploy to server
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/MindForge/
+          scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
+          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}|g" docker-compose.yml
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
-            cd MindForge && \
+            cd ~/MindForge && \
             sudo docker system prune -af && \
             sudo docker volume prune -f && \
             sudo docker-compose -f docker-compose.yml down --remove-orphans && \
