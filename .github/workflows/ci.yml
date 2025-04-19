@@ -158,7 +158,6 @@ jobs:
             sudo docker-compose -f docker-compose.yml pull && \
             sudo docker-compose -f docker-compose.yml up -d --build --force-recreate
           "
-          
 
 #      - name:eploy to Server
 #        run: |
