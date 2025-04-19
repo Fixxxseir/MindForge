@@ -21,10 +21,7 @@ RUN apt-get update && \
 
 RUN pip install --upgrade pip && \
     pip install poetry
-
-COPY pyproject.toml poetry.lock* ./
-
-RUN poetry install --no-root --no-interaction --no-ansi
+    poetry install --no-root --no-interaction --no-ansi
 
 COPY . .
 
