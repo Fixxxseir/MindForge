@@ -6,19 +6,12 @@ ENV POETRY_VIRTUALENVS_CREATE=false \
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    postgresql-client \
-    build-essential \
+RUN apt-get update && apt-get install -y \
     libpq-dev \
-    gettext \
-    curl \
-    netcat-openbsd \
-    procps \
-    iputils-ping \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
+COPY pyproject.toml poetry.lock* ./
 RUN pip install --upgrade pip && \
     pip install poetry && \
     poetry install --no-root --no-interaction --no-ansi
