@@ -152,11 +152,12 @@ jobs:
       - name: Deploy to server
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
+          scp -r -o StrictHostKeyChecking=no ./nginx ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd MindForge && \
             sudo docker-compose down --remove-orphans && \
             sudo docker-compose pull && \
-            sudo docker-compose up -d
+            sudo docker-compose up -d --build
           "
           
           
