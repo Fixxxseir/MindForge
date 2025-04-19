@@ -149,7 +149,6 @@ jobs:
       - name: Deploy to server
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
-          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}|g" docker-compose.yml
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd ~/MindForge && \
             sudo docker system prune -af && \
