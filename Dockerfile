@@ -18,10 +18,10 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-RUN mkdir -p /app/staticfiles /app/media && \
-    chown -R 1000:1000 /app/staticfiles /app/media && \
-    chmod -R 755 /app/staticfiles /app/media
+RUN mkdir -p /app/static /app/media && \
+    chown -R 1000:1000 /app/static /app/media && \
+    chmod -R 755 /app/static /app/media
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
