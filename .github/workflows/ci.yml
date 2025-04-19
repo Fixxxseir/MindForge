@@ -126,7 +126,7 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
           
           # Образ Nginx
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }} -f nginx/Dockerfile .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }} -f ./nginx/Dockerfile ./nginx/
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}
 
   deploy:
@@ -152,8 +152,8 @@ jobs:
       # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
       - name: Deploy to server
         run: |
+          sed -i "s|build: .*/nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}|g" docker-compose.yml
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/MindForge/
-          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}|g" docker-compose.yml
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd ~/MindForge && \
             sudo docker system prune -af && \
