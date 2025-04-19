@@ -120,12 +120,15 @@ jobs:
         run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
       # Собираем Docker образ используя тег на основе крайнего коммита
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+      - name: Build and push all images
+        run: |
+          # Основной образ
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
 
-      # Отправляем собранный образ в Docker Hub
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          # Образ для nginx
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }} -f nginx/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}
 
   deploy:
     needs: build
@@ -150,6 +153,8 @@ jobs:
       # Останавливаем старый контейнер если он есть, удаляем если он есть и запускаем новый контейнер с проксированием порта 80:8000
       - name: Deploy to server
         run: |
+          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}|g" docker-compose.yml
+          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}|g" docker-compose.yml
           scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:MindForge/
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             cd MindForge && \

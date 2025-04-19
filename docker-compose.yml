@@ -70,7 +70,7 @@ services:
   celery:
     build: .
     command: >
-      bash -c "celery -A config  worker --loglevel=info --pool=eventlet"
+      bash -c "celery -A config.celery  worker --loglevel=INFO -B"
     volumes:
       - .:/app
     env_file:
