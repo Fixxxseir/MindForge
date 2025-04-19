@@ -69,7 +69,8 @@ services:
 
   celery:
     build: .
-    command: celery -A config worker --loglevel=info
+    command: >
+      bash -c "celery -A config  worker --loglevel=info --pool=eventlet"
     volumes:
       - .:/app
     env_file:
@@ -82,7 +83,8 @@ services:
 
   celery_beat:
     build: .
-    command: celery -A config beat --loglevel=info
+    command: >
+      bash -c "celery -A config beat --loglevel=info"
     healthcheck:
       test: [ "CMD", "celery", "-A", "config", "inspect", "ping" ]
       interval: 30s

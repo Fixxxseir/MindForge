@@ -129,16 +129,6 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }} -f nginx/Dockerfile ./nginx
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }}
 
-      - name: Build and push celery image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }} --target=celery .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }}
-
-      - name: Build and push celery-beat image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }} --target=celerybeat .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }}
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -158,13 +148,6 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      - name: Update docker-compose.yml with new images
-        run: |
-          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-web:${{ github.sha }}|" docker-compose.yml
-          sed -i "s|build: ./nginx|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-nginx:${{ github.sha }}|" docker-compose.yml
-          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celery:${{ github.sha }}|" docker-compose.yml services.celery
-          sed -i "s|build: \.|image: ${{ secrets.DOCKER_HUB_USERNAME }}/mindforge-celerybeat:${{ github.sha }}|" docker-compose.yml services.celery_beat
 
       - name: Deploy to server
         run: |
