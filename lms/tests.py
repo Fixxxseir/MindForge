@@ -1,5 +1,4 @@
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -235,7 +234,7 @@ class SubscriptionAPITestCase(APITestCase):
         url = reverse("lms:course-subscription", kwargs={'course_id': self.course.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), {"message": "подписка добавлена"})
+        self.assertEqual(response.json(), {"message": "Подписка добавлена"})
 
     def test_delete_subscription(self):
         Subscription.objects.create(owner=self.user, course=self.course)
